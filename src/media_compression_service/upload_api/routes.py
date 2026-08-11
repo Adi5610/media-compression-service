@@ -1,16 +1,24 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 
-from media_compression_service.upload_api.schemas import UploadImageResponse
-from media_compression_service.upload_api.services.upload_service import UploadService
+from media_compression_service.upload_api.dependencies import uploadServiceDep
+from media_compression_service.upload_api.schemas import UploadImageResponse, ImageID, CreateImageRequest
 
-router = APIRouter(prefix="/images", tags=["Images"])
-
-upload_service = UploadService()
+router = APIRouter(prefix="/api/v1/images", tags=["Images"])
 
 # Response model : 1. Validates the response 2. Filters extra fields 3. Generates API documentation
-@router.post("", response_model=UploadImageResponse)
-async def upload_image(image: UploadFile = File(...)):
+@router.post("",
+             status_code=201,
+             response_model=UploadImageResponse)
+async def upload_image(request: CreateImageRequest,
+                       service: uploadServiceDep):
 
-    message = await upload_service.upload_image(image)
-    return UploadImageResponse(message=message)
+    result = await service.upload_image(
+        file_name=request.filename,
+        content_type=request.content_type,
+    )
+    return UploadImageResponse(
+        image_id=result.image_id,
+        upload_url=result.upload_url,
+        status=result.status,
+    )
 
