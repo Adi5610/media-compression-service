@@ -1,4 +1,3 @@
-from datetime import timezone, datetime
 from uuid import UUID
 
 import boto3
@@ -14,21 +13,13 @@ class S3Repository:
 
         self.client = boto3.client('s3', region_name=region)
 
-    def generate_upload_url(self, image_id: UUID, filename: str, content_type: str) -> tuple[str, str] :
+    def generate_upload_url(self, s3_key: str, content_type: str) -> str:
 
         """
 
-        creates s3_key and generates upload url for given image_id, filename and content_type
+        generates upload url for given image_id, filename and content_type
 
         """
-        extension = filename.rsplit('.', 1)[-1]
-
-        now = datetime.now(timezone.utc)
-
-        s3_key = (f"pending/"
-                  f"{now:%y/%m/%d}/"
-                  f"{image_id}.{extension}"
-                  )
 
         upload_url = self.client.generate_presigned_url(
             ClientMethod="put_object",
@@ -40,7 +31,7 @@ class S3Repository:
             ExpiresIn=self.upload_url_expiration,
         )
 
-        return s3_key, upload_url
+        return upload_url
 
 
 

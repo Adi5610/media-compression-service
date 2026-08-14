@@ -15,6 +15,7 @@ async def upload_image(request: CreateImageRequest,
     result = await service.upload_image(
         file_name=request.filename,
         content_type=request.content_type,
+        size=request.size,
     )
     return UploadImageResponse(
         image_id=result.image_id,
