@@ -13,7 +13,7 @@ def _genrate_s3_key(image_id: UUID, file_name: str) -> str:
     extension = file_name.rsplit('.', 1)[-1]
 
 
-    return (f"pending/"
+    return (f"original/"
               f"{now:%y/%m/%d}/"
               f"{image_id}.{extension}"
               )
